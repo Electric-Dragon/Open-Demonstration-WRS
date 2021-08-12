@@ -1,1 +1,2 @@
-# Open-Demonstration-WRS
+# Open Demonstration WRS
+## Team Name: The Uchihas
