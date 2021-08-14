@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from _typeshed import NoneType
+# from _typeshed import NoneType
 import cv2
 import os
 import sys, getopt
