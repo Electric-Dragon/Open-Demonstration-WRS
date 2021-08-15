@@ -10,7 +10,7 @@ found = False
 dropping = False
 taskDone = False
 
-motor1 = m(18,16,22)
+motor1 = m(16,18,22)
 motor2 = m(11,13,15)
 motor3 = m(19,21,23)
 
@@ -19,6 +19,9 @@ cs.main(sys.argv[1:])
 while not taskDone:
 
     predictions = cs.getResults()
+
+    motor1.goForward()
+    motor2.goForward()
 
     clothes = []
 
