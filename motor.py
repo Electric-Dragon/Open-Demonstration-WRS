@@ -1,11 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
-# in1 = 24
-# in2 = 23
-# en = 25
-# temp1=1
-
 GPIO.setmode(GPIO.BOARD)
 
 class Motor:
@@ -21,13 +16,13 @@ class Motor:
         p=GPIO.PWM(self.en,1000)
         p.start(75)
 
-    def goForward(self):
-        GPIO.output(self.in1,GPIO.HIGH)
-        GPIO.output(self.in2,GPIO.LOW)
-
-    def goBackward(self):
+    def antiClockwise(self):
         GPIO.output(self.in1,GPIO.LOW)
         GPIO.output(self.in2,GPIO.HIGH)
+
+    def clockwise(self):
+        GPIO.output(self.in1,GPIO.HIGH)
+        GPIO.output(self.in2,GPIO.LOW)
     
     def stop(self):
         GPIO.output(self.in1,GPIO.LOW)
