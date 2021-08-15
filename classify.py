@@ -1,10 +1,4 @@
 #!/usr/bin/env python
-
-<<<<<<< HEAD
-#import NoneType
-=======
-# from _typeshed import NoneType
->>>>>>> 804d642f7daf85f9d00788f61e1bee292bf23804
 import cv2
 import os
 import sys, getopt
