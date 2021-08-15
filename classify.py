@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from _typeshed import NoneType
+#import NoneType
 import cv2
 import os
 import sys, getopt
@@ -126,7 +126,7 @@ def main(argv):
         finally:
             if (runner):
                 runner.stop()
-                
+
 
 def getResults():
     return results
