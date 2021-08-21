@@ -27,3 +27,7 @@ class Motor:
     def stop(self):
         GPIO.output(self.in1,GPIO.LOW)
         GPIO.output(self.in2,GPIO.LOW)
+
+    def changePWM(self, num):
+        p = GPIO.PWM(self.en, 1000)
+        p.ChangeDutyCycle(num)

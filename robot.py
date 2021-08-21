@@ -1,5 +1,6 @@
 from ultrasonic import USSensor as us
 from motor import Motor as m
+from grabber import Grabber as g
 import RPi.GPIO as GPIO
 import time
 import sys
@@ -21,6 +22,11 @@ motor1 = m(16,18,22)
 motor2 = m(11,13,15)
 motor3 = m(19,21,23)
 motor4 = m(29,31,33)
+<<<<<<< HEAD
+=======
+
+grabber = g(motor3, motor4)
+>>>>>>> e3a9ad9ed47093d43b1e665cec6437f11a27f1b2
 
     #    if 'cloth' in predictions and searching:
     #        clothes = predictions[predictions['label']=='cloth']
@@ -102,8 +108,11 @@ def main(argv):
                 ret = camera.read()[0]
                 if ret:
                     backendName = camera.getBackendName()
+                    global width, height
                     w = camera.get(3)
                     h = camera.get(4)
+                    width = w
+                    height = h
                     print("Camera %s (%s x %s) in port %s selected." %(backendName,h,w, videoCaptureDeviceId))
                     camera.release()
                 else:
@@ -145,8 +154,37 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    print(result)
+    result = result['result']['bounding_boxes']
+    for bb in result:
+        if searching:
+            if bb['label'] == 'cloth':
+                minRange = (width/2)-(bb['width']/2)-10
+                maxRange = (width/2)+(bb['width']/2)+10
+                if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
+                    goForward()
+                    time.sleep(1.5)
+                    stopMotor(motor1)
+                    stopMotor(motor2)
     print(type(result))
+
+def goForward():
+    motor1.antiClockwise()
+    motor2.clockwise()
+
+def goBack():
+    motor1.clockwise()
+    motor2.antiClockwise()
+
+def goLeft():
+    motor1.clockwise()
+    motor2.clockwise()
+
+def goRight():
+    motor1.antiClockwise()
+    motor2.antiClockwise()
+
+def stopMotor(motor: m):
+    motor.stop()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
