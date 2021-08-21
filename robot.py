@@ -20,7 +20,7 @@ taskDone = False
 motor1 = m(16,18,22)
 motor2 = m(11,13,15)
 motor3 = m(19,21,23)
-motor4 = m(27,29,31)
+motor4 = m(29,31,33)
 
     #    if 'cloth' in predictions and searching:
     #        clothes = predictions[predictions['label']=='cloth']
