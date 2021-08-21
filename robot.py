@@ -11,12 +11,36 @@ import signal
 import time
 from edge_impulse_linux.image import ImageImpulseRunner
 
+GPIO.setmode(GPIO.BOARD)
+
 runner = None
 show_camera = True
 searching = True
 found = False
 dropping = False
 taskDone = False
+
+in1 = 16
+in2 = 18
+en = 22
+in3 = 11
+in4 = 13
+en2 = 15
+
+GPIO.setup(in1,GPIO.OUT)
+GPIO.setup(in2,GPIO.OUT)
+GPIO.setup(en,GPIO.OUT)
+GPIO.output(in1,GPIO.LOW)
+GPIO.output(in2,GPIO.LOW)
+p=GPIO.PWM(en,1000)
+p.start(75)
+GPIO.setup(in3,GPIO.OUT)
+GPIO.setup(in4,GPIO.OUT)
+GPIO.setup(en2,GPIO.OUT)
+GPIO.output(in3,GPIO.LOW)
+GPIO.output(in4,GPIO.LOW)
+p2=GPIO.PWM(en2,1000)
+p2.start(75)
 
     #    if 'cloth' in predictions and searching:
     #        clothes = predictions[predictions['label']=='cloth']
@@ -160,12 +184,20 @@ def goToObject(result):
     print(type(result))
 
 def goForward():
-    motor1.antiClockwise()
-    motor2.clockwise()
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.HIGH)
+    GPIO.output(in3,GPIO.HIGH)
+    GPIO.output(in4,GPIO.LOW)
+    # motor1.antiClockwise()
+    # motor2.clockwise()
 
 def goBack():
-    motor1.clockwise()
-    motor2.antiClockwise()
+    GPIO.output(in1,GPIO.HIGH)
+    GPIO.output(in2,GPIO.LOW)
+    GPIO.output(in3,GPIO.LOW)
+    GPIO.output(in4,GPIO.HIGH)
+    # motor1.clockwise()
+    # motor2.antiClockwise()
 
 def goLeft():
     motor1.clockwise()
