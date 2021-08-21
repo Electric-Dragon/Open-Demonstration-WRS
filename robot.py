@@ -105,8 +105,11 @@ def main(argv):
                 ret = camera.read()[0]
                 if ret:
                     backendName = camera.getBackendName()
+                    global width, height
                     w = camera.get(3)
                     h = camera.get(4)
+                    width = w
+                    height = h
                     print("Camera %s (%s x %s) in port %s selected." %(backendName,h,w, videoCaptureDeviceId))
                     camera.release()
                 else:
@@ -148,7 +151,17 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    print(result)
+    result = result['result']['bounding_boxes']
+    for bb in result:
+        if searching:
+            if bb['label'] == 'cloth':
+                minRange = (width/2)-(bb['width']/2)-10
+                maxRange = (width/2)+(bb['width']/2)+10
+                if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
+                    goForward()
+                    time.sleep(1.5)
+                    stopMotor(motor1)
+                    stopMotor(motor2)
     print(type(result))
 
 def goForward():
