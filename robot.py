@@ -40,6 +40,7 @@ def get_webcams():
                 backendName =camera.getBackendName()
                 w = camera.get(3)
                 h = camera.get(4)
+                print('width',w,'height',h)
                 print("Camera %s (%s x %s) found in port %s " %(backendName,h,w, port))
                 port_ids.append(port)
             camera.release()
