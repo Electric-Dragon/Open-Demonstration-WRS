@@ -1,5 +1,6 @@
 from ultrasonic import USSensor as us
 from motor import Motor as m
+from grabber import Grabber as g
 import RPi.GPIO as GPIO
 import time
 import sys
@@ -21,6 +22,8 @@ motor1 = m(16,18,22)
 motor2 = m(11,13,15)
 motor3 = m(19,21,23)
 motor4 = m(29,31,33)
+
+grabber = g(motor3, motor4)
 
     #    if 'cloth' in predictions and searching:
     #        clothes = predictions[predictions['label']=='cloth']
@@ -147,6 +150,25 @@ def main(argv):
 def goToObject(result):
     print(result)
     print(type(result))
+
+def goForward():
+    motor1.antiClockwise()
+    motor2.clockwise()
+
+def goBack():
+    motor1.clockwise()
+    motor2.antiClockwise()
+
+def goLeft():
+    motor1.clockwise()
+    motor2.clockwise()
+
+def goRight():
+    motor1.antiClockwise()
+    motor2.antiClockwise()
+
+def stopMotor(motor: m):
+    motor.stop()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
