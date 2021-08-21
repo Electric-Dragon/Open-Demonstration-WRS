@@ -23,7 +23,7 @@ class Motor:
     def clockwise(self):
         GPIO.output(self.in1,GPIO.HIGH)
         GPIO.output(self.in2,GPIO.LOW)
-    
+
     def stop(self):
         GPIO.output(self.in1,GPIO.LOW)
         GPIO.output(self.in2,GPIO.LOW)
@@ -31,3 +31,15 @@ class Motor:
     def changePWM(self, num):
         p = GPIO.PWM(self.en, 1000)
         p.ChangeDutyCycle(num)
+
+if __name__ == '__main__':
+    motor1 = Motor(16,18,22)
+    motor2 = Motor(11,13,15)
+
+    motor1.antiClockwise()
+    motor2.clockwise()
+
+    sleep(2)
+    motor1.stop()
+    motor2.stop()
+    GPIO.cleanup()

@@ -18,16 +18,6 @@ found = False
 dropping = False
 taskDone = False
 
-motor1 = m(16,18,22)
-motor2 = m(11,13,15)
-motor3 = m(19,21,23)
-motor4 = m(29,31,33)
-<<<<<<< HEAD
-=======
-
-grabber = g(motor3, motor4)
->>>>>>> e3a9ad9ed47093d43b1e665cec6437f11a27f1b2
-
     #    if 'cloth' in predictions and searching:
     #        clothes = predictions[predictions['label']=='cloth']
     #        sortedResults = sorted(clothes, key=lambda x: (clothes[x]['width']))
@@ -135,7 +125,7 @@ def main(argv):
 
                     elif "bounding_boxes" in res["result"].keys():
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
-                        goToObject(res['result']['bounding_boxes'])
+                        goToObject(res)
                         for bb in res["result"]["bounding_boxes"]:
                             # if bb['label'] == 'raspberry-pi':
                             #     count+=1
@@ -165,6 +155,8 @@ def goToObject(result):
                     time.sleep(1.5)
                     stopMotor(motor1)
                     stopMotor(motor2)
+                else:
+                    print('not in front of robot')
     print(type(result))
 
 def goForward():
@@ -187,5 +179,16 @@ def stopMotor(motor: m):
     motor.stop()
 
 if __name__ == "__main__":
+    motor1 = m(16,18,22)
+    motor2 = m(11,13,15)
+    motor3 = m(19,21,23)
+    motor4 = m(29,31,33)
+
+    grabber = g(motor3, motor4)
+
+    goForward()
+    time.sleep(3)
+    stopMotor(motor1)
+    stopMotor(motor2)
     main(sys.argv[1:])
     GPIO.cleanup()
