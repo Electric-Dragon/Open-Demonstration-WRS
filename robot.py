@@ -172,13 +172,13 @@ def goToObject(result):
     for bb in result:
         if searching:
             if bb['label'] == 'cloth':
-                minRange = (width/2)-(bb['width']/2)-10
-                maxRange = (width/2)+(bb['width']/2)+10
+                minRange = (width/2)-(bb['width']/2)-150
+                maxRange = (width/2)+(bb['width']/2)+100
+                print('minRange',minRange,'maxRange',maxRange,'x',bb['x'],'x+width',bb['x']+bb['width'])
                 if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
                     goForward()
                     time.sleep(1.5)
-                    stopMotor(motor1)
-                    stopMotor(motor2)
+                    stopMotor()
                 else:
                     print('not in front of robot')
     print(type(result))
@@ -207,20 +207,23 @@ def goRight():
     motor1.antiClockwise()
     motor2.antiClockwise()
 
-def stopMotor(motor: m):
-    motor.stop()
+def stopMotor():
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.LOW)
+    GPIO.output(in3,GPIO.LOW)
+    GPIO.output(in4,GPIO.LOW)
+    #motor.stop()
 
 if __name__ == "__main__":
-    motor1 = m(16,18,22)
-    motor2 = m(11,13,15)
+    #motor1 = m(16,18,22)
+    #motor2 = m(11,13,15)
     motor3 = m(19,21,23)
     motor4 = m(29,31,33)
 
     grabber = g(motor3, motor4)
 
-    goForward()
-    time.sleep(3)
-    stopMotor(motor1)
-    stopMotor(motor2)
+    #goForward()
+    #time.sleep(3)
+    #stopMotor()
     main(sys.argv[1:])
     GPIO.cleanup()
