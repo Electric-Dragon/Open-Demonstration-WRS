@@ -23,9 +23,18 @@ taskDone = False
 in1 = 16
 in2 = 18
 en = 22
+
 in3 = 11
 in4 = 13
 en2 = 15
+
+in5 = 19
+in6 = 21
+en3 = 23
+
+in7 = 29
+in8 = 31
+en4 = 33
 
 GPIO.setup(in1,GPIO.OUT)
 GPIO.setup(in2,GPIO.OUT)
@@ -34,6 +43,7 @@ GPIO.output(in1,GPIO.LOW)
 GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
 p.start(57)
+
 GPIO.setup(in3,GPIO.OUT)
 GPIO.setup(in4,GPIO.OUT)
 GPIO.setup(en2,GPIO.OUT)
@@ -42,10 +52,28 @@ GPIO.output(in4,GPIO.LOW)
 p2=GPIO.PWM(en2,1000)
 p2.start(75)
 
-    #    if 'cloth' in predictions and searching:
-    #        clothes = predictions[predictions['label']=='cloth']
-    #        sortedResults = sorted(clothes, key=lambda x: (clothes[x]['width']))
-    #        print(sortedResults)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(in5,GPIO.OUT)
+GPIO.setup(in6,GPIO.OUT)
+GPIO.setup(en3,GPIO.OUT)
+GPIO.output(in5,GPIO.LOW)
+GPIO.output(in6,GPIO.LOW)
+p3=GPIO.PWM(en3,1000)
+p3.start(25)
+
+GPIO.setup(in7,GPIO.OUT)
+GPIO.setup(in8,GPIO.OUT)
+GPIO.setup(en4,GPIO.OUT)
+GPIO.output(in7,GPIO.LOW)
+GPIO.output(in8,GPIO.LOW)
+p4=GPIO.PWM(en4,1000)
+p4.start(25)
+
+trig = 36
+echo = 37
+GPIO.setup(trig,GPIO.OUT)
+GPIO.setup(echo,GPIO.IN)
+
 
 def now():
     return round(time.time() * 1000)
@@ -176,10 +204,7 @@ def goToObject(result):
                 maxRange = (width/2)+40#(bb['width']/2)+25
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if bb['x']+(bb['width']/2) >= minRange and bb['x']+(bb['width']/2) <= maxRange:
-                # if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
-                    #goForward()
-                    #time.sleep(1.5)
-                    #stopMotor()
+                    print(getDistance(), 'cm')
                     print('in front of robot')
                 else:
                     print('not in front of robot')
@@ -224,16 +249,49 @@ def stopMotor():
     GPIO.output(in4,GPIO.LOW)
     #motor.stop()
 
+def grab():
+    GPIO.output(in7,GPIO.HIGH)
+    GPIO.output(in8,GPIO.LOW)
+    time.sleep(1.75)
+    GPIO.output(in7,GPIO.LOW)
+    GPIO.output(in8,GPIO.LOW)
+    GPIO.output(in5,GPIO.HIGH)
+    GPIO.output(in6,GPIO.LOW)
+    time.sleep(0.33)
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.LOW)
+    GPIO.output(in7,GPIO.LOW)
+    GPIO.output(in8,GPIO.HIGH)
+    time.sleep(0.5)
+    GPIO.output(in7,GPIO.LOW)
+    GPIO.output(in8,GPIO.LOW)
+
+def drop():
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.HIGH)
+    time.sleep(0.3)
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.LOW)
+
+def getDistance():
+    GPIO.output(trig, True)
+    time.sleep(0.00001)
+    GPIO.output(trig, False)
+
+    start = time.time()
+    stop = time.time()
+
+    while GPIO.input(echo) == 0:
+        start = time.time()
+        
+    while GPIO.input(echo) == 1:
+        stop = time.time()
+
+    timeElapsed = stop - start
+    distance = (timeElapsed * 34300) / 2
+
+    return distance
+
 if __name__ == "__main__":
-    #motor1 = m(16,18,22)
-    #motor2 = m(11,13,15)
-    motor3 = m(19,21,23)
-    motor4 = m(29,31,33)
-
-    grabber = g(motor3, motor4)
-
-    #goForward()
-    #time.sleep(3)
-    #stopMotor()
     main(sys.argv[1:])
     GPIO.cleanup()
