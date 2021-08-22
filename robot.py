@@ -33,7 +33,7 @@ GPIO.setup(en,GPIO.OUT)
 GPIO.output(in1,GPIO.LOW)
 GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
-p.start(75)
+p.start(57)
 GPIO.setup(in3,GPIO.OUT)
 GPIO.setup(in4,GPIO.OUT)
 GPIO.setup(en2,GPIO.OUT)
@@ -173,12 +173,13 @@ def goToObject(result):
         if searching:
             if bb['label'] == 'cloth':
                 minRange = (width/2)-(bb['width']/2)-150
-                maxRange = (width/2)+(bb['width']/2)+100
+                maxRange = (width/2)+(bb['width']/2)+25
                 print('minRange',minRange,'maxRange',maxRange,'x',bb['x'],'x+width',bb['x']+bb['width'])
                 if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
-                    goForward()
-                    time.sleep(1.5)
-                    stopMotor()
+                    #goForward()
+                    #time.sleep(1.5)
+                    #stopMotor()
+                    print('in front of robot')
                 else:
                     print('not in front of robot')
     print(type(result))
