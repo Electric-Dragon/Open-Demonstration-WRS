@@ -125,8 +125,8 @@ def main(argv):
                     global width, height
                     w = camera.get(3)
                     h = camera.get(4)
-                    width = w
-                    height = h
+                    width = 320
+                    height = 320
                     print("Camera %s (%s x %s) in port %s selected." %(backendName,h,w, videoCaptureDeviceId))
                     camera.release()
                 else:
@@ -156,9 +156,9 @@ def main(argv):
                             #     print('Spotted Raspberry Pi ' + str(count) + ' times!')
                             print('\t%s (%.2f): x=%d y=%d w=%d h=%d' % (bb['label'], bb['value'], bb['x'], bb['y'], bb['width'], bb['height']))
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
-
                     if (show_camera):
                         cv2.imshow('edgeimpulse', img)
+                        #print(cv2.getWindowImageRect('edgeimpulse'))
                         if cv2.waitKey(1) == ord('q'):
                             break
 
@@ -172,9 +172,9 @@ def goToObject(result):
     for bb in result:
         if searching:
             if bb['label'] == 'cloth':
-                minRange = (width/2)-25#(bb['width']/2)-150
-                maxRange = (width/2)+25#(bb['width']/2)+25
-                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange)
+                minRange = (width/2)-40#(bb['width']/2)-150
+                maxRange = (width/2)+40#(bb['width']/2)+25
+                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if bb['x']+(bb['width']/2) >= minRange and bb['x']+(bb['width']/2) <= maxRange:
                 # if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
                     #goForward()
@@ -183,7 +183,7 @@ def goToObject(result):
                     print('in front of robot')
                 else:
                     print('not in front of robot')
-    print(type(result))
+    #print(type(result))
 
 def goForward():
     GPIO.output(in1,GPIO.LOW)
