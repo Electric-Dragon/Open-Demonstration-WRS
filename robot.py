@@ -172,10 +172,11 @@ def goToObject(result):
     for bb in result:
         if searching:
             if bb['label'] == 'cloth':
-                minRange = (width/2)-(bb['width']/2)-150
-                maxRange = (width/2)+(bb['width']/2)+25
-                print('minRange',minRange,'maxRange',maxRange,'x',bb['x'],'x+width',bb['x']+bb['width'])
-                if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
+                minRange = (width/2)-25#(bb['width']/2)-150
+                maxRange = (width/2)+25#(bb['width']/2)+25
+                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange)
+                if bb['x']+(bb['width']/2) >= minRange and bb['x']+(bb['width']/2) <= maxRange:
+                # if bb['x'] >= minRange and bb['x']+bb['width'] <= maxRange:
                     #goForward()
                     #time.sleep(1.5)
                     #stopMotor()
@@ -201,12 +202,20 @@ def goBack():
     # motor2.antiClockwise()
 
 def goLeft():
-    motor1.clockwise()
-    motor2.clockwise()
+    GPIO.output(in1,GPIO.HIGH)
+    GPIO.output(in2,GPIO.LOW)
+    GPIO.output(in3,GPIO.HIGH)
+    GPIO.output(in4,GPIO.LOW)
+    # motor1.clockwise()
+    # motor2.clockwise()
 
 def goRight():
-    motor1.antiClockwise()
-    motor2.antiClockwise()
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.HIGH)
+    GPIO.output(in3,GPIO.LOW)
+    GPIO.output(in4,GPIO.HIGH)
+    # motor1.antiClockwise()
+    # motor2.antiClockwise()
 
 def stopMotor():
     GPIO.output(in1,GPIO.LOW)
