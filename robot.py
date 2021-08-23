@@ -19,6 +19,8 @@ searching = True
 found = False
 dropping = False
 taskDone = False
+global doingTask
+doingTask = False
 
 in1 = 16
 in2 = 18
@@ -184,6 +186,9 @@ def main(argv):
                             #     print('Spotted Raspberry Pi ' + str(count) + ' times!')
                             print('\t%s (%.2f): x=%d y=%d w=%d h=%d' % (bb['label'], bb['value'], bb['x'], bb['y'], bb['width'], bb['height']))
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
+                    else:
+                        if not doingTask:
+                            stopMotor()
                     if (show_camera):
                         cv2.imshow('edgeimpulse', img)
                         #print(cv2.getWindowImageRect('edgeimpulse'))
@@ -205,6 +210,7 @@ def goToObject(result):
                 midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
+                    doingTask = True
                     print(getDistance(), 'cm')
                     print('in front of robot')
                     if getDistance() >= 9:
@@ -220,6 +226,7 @@ def goToObject(result):
                     #while midPoint > maxRange:
                     #    goRight()
                     #stopMotor()
+                    doingTask = False
                     print('not in front of robot')
     #print(type(result))
 
