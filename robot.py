@@ -202,15 +202,29 @@ def goToObject(result):
             if bb['label'] == 'cloth':
                 minRange = (width/2)-40#(bb['width']/2)-150
                 maxRange = (width/2)+40#(bb['width']/2)+25
+                midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
-                if bb['x']+(bb['width']/2) >= minRange and bb['x']+(bb['width']/2) <= maxRange:
+                if midPoint >= minRange and midPoint <= maxRange:
                     print(getDistance(), 'cm')
                     print('in front of robot')
+                    while getDistance() >= 9:
+                        goForward()
+                    stopMotor()
+                    grab()
                 else:
+                    p.ChangeDutyCycle(25)
+                    p2.ChangeDutyCycle(25)
+                    while midPoint < minRange:
+                        goLeft()
+                    while midPoint > maxRange:
+                        goRight()
+                    stopMotor()
                     print('not in front of robot')
     #print(type(result))
 
 def goForward():
+    p.ChangeDutyCycle(57)
+    p2.ChangeDutyCycle(75)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.HIGH)
