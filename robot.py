@@ -71,10 +71,8 @@ GPIO.output(in8,GPIO.LOW)
 p4=GPIO.PWM(en4,1000)
 p4.start(25)
 
-trig = 36
-echo = 37
-GPIO.setup(trig,GPIO.OUT)
-GPIO.setup(echo,GPIO.IN)
+ir = 36
+GPIO.setup(ir,GPIO.IN)
 
 
 def now():
@@ -211,13 +209,12 @@ def goToObject(result):
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
                     doingTask = True
-                    print(getDistance(), 'cm')
                     print('in front of robot')
-                    if getDistance() >= 9:
+                    if GPIO.input(ir):
                         goForward()
                     else:
                         stopMotor()
-                        grab()
+                        # grab()
                 else:
                     #p.ChangeDutyCycle(25)
                     #p2.ChangeDutyCycle(25)
@@ -294,25 +291,6 @@ def drop():
     time.sleep(0.3)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
-
-def getDistance():
-    GPIO.output(trig, True)
-    time.sleep(0.00001)
-    GPIO.output(trig, False)
-
-    start = time.time()
-    stop = time.time()
-
-    while GPIO.input(echo) == 0:
-        start = time.time()
-
-    while GPIO.input(echo) == 1:
-        stop = time.time()
-
-    timeElapsed = stop - start
-    distance = (timeElapsed * 34300) / 2
-
-    return distance
 
 if __name__ == "__main__":
     main(sys.argv[1:])
