@@ -44,7 +44,7 @@ GPIO.setup(en,GPIO.OUT)
 GPIO.output(in1,GPIO.LOW)
 GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
-p.start(28.5)
+p.start(25)
 
 GPIO.setup(in3,GPIO.OUT)
 GPIO.setup(in4,GPIO.OUT)
@@ -52,7 +52,7 @@ GPIO.setup(en2,GPIO.OUT)
 GPIO.output(in3,GPIO.LOW)
 GPIO.output(in4,GPIO.LOW)
 p2=GPIO.PWM(en2,1000)
-p2.start(37.5)
+p2.start(25)
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(in5,GPIO.OUT)
@@ -214,7 +214,10 @@ def goToObject(result):
                         goForward()
                     else:
                         stopMotor()
-                        # grab()
+                        goBack()
+                        time.sleep(0.1)
+                        stopMotor()
+                        grab()
                 else:
                     #p.ChangeDutyCycle(25)
                     #p2.ChangeDutyCycle(25)
@@ -228,69 +231,62 @@ def goToObject(result):
     #print(type(result))
 
 def goForward():
-    p.ChangeDutyCycle(57)
-    p2.ChangeDutyCycle(75)
+    p.ChangeDutyCycle(50)
+    p2.ChangeDutyCycle(45)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
-    # motor1.antiClockwise()
-    # motor2.clockwise()
 
 def goBack():
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.LOW)
     GPIO.output(in4,GPIO.HIGH)
-    # motor1.clockwise()
-    # motor2.antiClockwise()
 
-def goLeft():
+def goRight():
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
-    # motor1.clockwise()
-    # motor2.clockwise()
 
-def goRight():
+def goLeft():
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.LOW)
     GPIO.output(in4,GPIO.HIGH)
-    # motor1.antiClockwise()
-    # motor2.antiClockwise()
 
 def stopMotor():
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.LOW)
     GPIO.output(in4,GPIO.LOW)
-    #motor.stop()
 
 def grab():
-    GPIO.output(in7,GPIO.HIGH)
-    GPIO.output(in8,GPIO.LOW)
-    time.sleep(1.75)
-    GPIO.output(in7,GPIO.LOW)
-    GPIO.output(in8,GPIO.LOW)
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
-    time.sleep(0.33)
+    time.sleep(0.4)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
+    GPIO.output(in7,GPIO.HIGH)
+    GPIO.output(in8,GPIO.LOW)
+    time.sleep(2)
+    GPIO.output(in7,GPIO.LOW)
+    GPIO.output(in8,GPIO.LOW)
+    p3.ChangeDutyCycle(50)
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.HIGH)
+    time.sleep(0.5)
+    p3.ChangeDutyCycle(25)
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.LOW)
+
+def drop():
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.HIGH)
     time.sleep(0.5)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
-
-def drop():
-    GPIO.output(in5,GPIO.LOW)
-    GPIO.output(in6,GPIO.HIGH)
-    time.sleep(0.3)
-    GPIO.output(in5,GPIO.LOW)
-    GPIO.output(in6,GPIO.LOW)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
