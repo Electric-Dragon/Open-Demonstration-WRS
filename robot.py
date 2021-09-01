@@ -218,6 +218,7 @@ def goToObject(result):
                         time.sleep(0.1)
                         stopMotor()
                         grab()
+                        break
                 else:
                     #p.ChangeDutyCycle(25)
                     #p2.ChangeDutyCycle(25)
@@ -232,7 +233,7 @@ def goToObject(result):
 
 def goForward():
     p.ChangeDutyCycle(50)
-    p2.ChangeDutyCycle(45)
+    p2.ChangeDutyCycle(40)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.HIGH)
