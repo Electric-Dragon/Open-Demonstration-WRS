@@ -220,15 +220,19 @@ def goToObject(result):
                         grab()
                         break
                 else:
-                    #p.ChangeDutyCycle(25)
-                    #p2.ChangeDutyCycle(25)
-                    #while midPoint < minRange:
-                    #    goLeft()
-                    #while midPoint > maxRange:
-                    #    goRight()
-                    #stopMotor()
+                    p.ChangeDutyCycle(25)
+                    p2.ChangeDutyCycle(25)
+                    if midPoint < minRange:
+                       goLeft()
+                       time.sleep(0.1)
+                       stopMotor()
+                    if midPoint > maxRange:
+                       goRight()
+                       time.sleep(0.1)
+                       stopMotor()
                     doingTask = False
                     print('not in front of robot')
+                    break
     #print(type(result))
 
 def goForward():
