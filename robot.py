@@ -15,6 +15,8 @@ GPIO.setmode(GPIO.BOARD)
 
 runner = None
 show_camera = True
+
+global dropping, searching
 searching = True
 found = False
 dropping = False
@@ -186,6 +188,8 @@ def main(argv):
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
                     else:
                         if not doingTask:
+                            goLeft()
+                            time.sleep(0.3)
                             stopMotor()
                     if (show_camera):
                         cv2.imshow('edgeimpulse', img)
@@ -218,21 +222,54 @@ def goToObject(result):
                         time.sleep(0.1)
                         stopMotor()
                         grab()
-                        break
+                        doingTask = False
+                        dropping = True
+                        searching = False
+                    break
+
                 else:
-                    p.ChangeDutyCycle(25)
-                    p2.ChangeDutyCycle(25)
-                    if midPoint < minRange:
-                       goLeft()
-                       time.sleep(0.1)
-                       stopMotor()
-                    if midPoint > maxRange:
-                       goRight()
-                       time.sleep(0.1)
-                       stopMotor()
+                    alignRobot(midPoint, minRange, maxRange)
+                    # p.ChangeDutyCycle(25)
+                    # p2.ChangeDutyCycle(25)
+                    # if midPoint < minRange:
+                    #    goLeft()
+                    #    time.sleep(0.1)
+                    #    stopMotor()
+                    # if midPoint > maxRange:
+                    #    goRight()
+                    #    time.sleep(0.1)
+                    #    stopMotor()
                     doingTask = False
                     print('not in front of robot')
+                break
+        if dropping:
+            if bb['label'] == 'basket':
+                minRange = (width/2)-40#(bb['width']/2)-150
+                maxRange = (width/2)+40#(bb['width']/2)+25
+                midPoint = bb['x']+(bb['width']/2)
+                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
+                if midPoint >= minRange and midPoint <= maxRange:
+                    doingTask = True
+                    print('in front of robot')
+                    if GPIO.input(ir):
+                        goForward()
+                    else:
+                        stopMotor()
+                        goBack()
+                        time.sleep(0.1)
+                        stopMotor()
+                        drop()
+                        doingTask = False
+                        dropping = False
+                        searching = True
                     break
+
+                else:
+                    alignRobot(midPoint, minRange, maxRange)
+                    doingTask = False
+                    print('not in front of robot')
+                break
+
     #print(type(result))
 
 def goForward():
@@ -292,6 +329,19 @@ def drop():
     time.sleep(0.5)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
+
+def alignRobot(midPoint ,minRange, maxRange):
+    p.ChangeDutyCycle(25)
+    p2.ChangeDutyCycle(25)
+    if midPoint < minRange:
+        goLeft()
+        time.sleep(0.1)
+        stopMotor()
+    if midPoint > maxRange:
+        goRight()
+        time.sleep(0.1)
+        stopMotor()
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
