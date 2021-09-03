@@ -17,9 +17,9 @@ runner = None
 show_camera = True
 
 #global dropping, searching
-#searching = True
+searching = True
+dropping = False
 found = False
-#dropping = False
 taskDone = False
 global doingTask
 doingTask = False
@@ -164,6 +164,8 @@ def main(argv):
 
                 next_frame = 0 # limit to ~10 fps here
 
+                time.sleep(2)
+
                 for res, img in runner.classifier(videoCaptureDeviceId):
                     if (next_frame > now()):
                         time.sleep((next_frame - now()) / 1000)
@@ -182,7 +184,7 @@ def main(argv):
                             if not doingTask:
                                 rotate()
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
-                        goToObject(res,searching,dropping)
+                        goToObject(res)
                         for bb in res["result"]["bounding_boxes"]:
                             # if bb['label'] == 'raspberry-pi':
                             #     count+=1
@@ -191,7 +193,7 @@ def main(argv):
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
                     if (show_camera):
                         cv2.imshow('The Uchihas', img)
-                        #print(cv2.getWindowImageRect('edgeimpulse'))
+                        #print(cv2.getWindowImageRect('The Uchihas'))
                         if cv2.waitKey(1) == ord('q'):
                             break
 
@@ -200,7 +202,9 @@ def main(argv):
                 if (runner):
                     runner.stop()
 
-def goToObject(result, searching, dropping):
+def goToObject(result):
+    global searching, dropping
+    time.sleep(0.4)
     result = result['result']['bounding_boxes']
     for bb in result:
         if searching:
@@ -214,6 +218,8 @@ def goToObject(result, searching, dropping):
                     print('in front of robot')
                     if GPIO.input(ir):
                         goForward()
+                        time.sleep(0.3)
+                        stopMotor()
                     else:
                         stopMotor()
                         goBack()
@@ -331,6 +337,7 @@ def drop():
     GPIO.output(in8,GPIO.LOW)
 
 def alignRobot(midPoint ,minRange, maxRange):
+    #time.sleep(0.4)
     p.ChangeDutyCycle(25)
     p2.ChangeDutyCycle(25)
     if midPoint < minRange:
@@ -343,6 +350,7 @@ def alignRobot(midPoint ,minRange, maxRange):
         stopMotor()
 
 def rotate():
+    time.sleep(0.1)
     p.ChangeDutyCycle(25)
     p2.ChangeDutyCycle(25)
     goLeft()
@@ -352,8 +360,5 @@ def rotate():
 
 
 if __name__ == "__main__":
-    global dropping, searching
-    searching = True
-    dropping = False
     main(sys.argv[1:])
     GPIO.cleanup()
