@@ -164,13 +164,9 @@ def main(argv):
 
                 next_frame = 0 # limit to ~10 fps here
 
-                time.sleep(2)
-
                 for res, img in runner.classifier(videoCaptureDeviceId):
                     if (next_frame > now()):
                         time.sleep((next_frame - now()) / 1000)
-
-                    #print('classification runner response', res)
 
                     if "classification" in res["result"].keys():
                         print('Result (%d ms.) ' % (res['timing']['dsp'] + res['timing']['classification']), end='')
@@ -216,33 +212,25 @@ def goToObject(result):
                 if midPoint >= minRange and midPoint <= maxRange:
                     doingTask = True
                     print('in front of robot')
-                    if GPIO.input(ir):
-                        goForward()
-                        time.sleep(0.3)
-                        stopMotor()
-                    else:
-                        stopMotor()
-                        goBack()
-                        time.sleep(0.08)
-                        stopMotor()
-                        grab()
-                        doingTask = False
-                        dropping = True
-                        searching = False
+                    while True:
+                        if GPIO.input(ir):
+                            goForward()
+                            # time.sleep(0.4)
+                            # stopMotor()
+                        else:
+                            stopMotor()
+                            goBack()
+                            time.sleep(0.08)
+                            stopMotor()
+                            grab()
+                            doingTask = False
+                            dropping = True
+                            searching = False
+                            break
                     break
 
                 else:
                     alignRobot(midPoint, minRange, maxRange)
-                    # p.ChangeDutyCycle(25)
-                    # p2.ChangeDutyCycle(25)
-                    # if midPoint < minRange:
-                    #    goLeft()
-                    #    time.sleep(0.1)
-                    #    stopMotor()
-                    # if midPoint > maxRange:
-                    #    goRight()
-                    #    time.sleep(0.1)
-                    #    stopMotor()
                     doingTask = False
                     print('not in front of robot')
                 break
