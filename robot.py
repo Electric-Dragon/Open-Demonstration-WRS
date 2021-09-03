@@ -16,10 +16,10 @@ GPIO.setmode(GPIO.BOARD)
 runner = None
 show_camera = True
 
-global dropping, searching
-searching = True
+#global dropping, searching
+#searching = True
 found = False
-dropping = False
+#dropping = False
 taskDone = False
 global doingTask
 doingTask = False
@@ -178,21 +178,19 @@ def main(argv):
                         print('', flush=True)
 
                     elif "bounding_boxes" in res["result"].keys():
+                        if len(res['result']['bounding_boxes']) == 0:
+                            if not doingTask:
+                                rotate()
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
-                        goToObject(res)
+                        goToObject(res,searching,dropping)
                         for bb in res["result"]["bounding_boxes"]:
                             # if bb['label'] == 'raspberry-pi':
                             #     count+=1
                             #     print('Spotted Raspberry Pi ' + str(count) + ' times!')
                             print('\t%s (%.2f): x=%d y=%d w=%d h=%d' % (bb['label'], bb['value'], bb['x'], bb['y'], bb['width'], bb['height']))
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
-                    else:
-                        if not doingTask:
-                            goLeft()
-                            time.sleep(0.3)
-                            stopMotor()
                     if (show_camera):
-                        cv2.imshow('edgeimpulse', img)
+                        cv2.imshow('The Uchihas', img)
                         #print(cv2.getWindowImageRect('edgeimpulse'))
                         if cv2.waitKey(1) == ord('q'):
                             break
@@ -202,7 +200,7 @@ def main(argv):
                 if (runner):
                     runner.stop()
 
-def goToObject(result):
+def goToObject(result, searching, dropping):
     result = result['result']['bounding_boxes']
     for bb in result:
         if searching:
@@ -219,7 +217,7 @@ def goToObject(result):
                     else:
                         stopMotor()
                         goBack()
-                        time.sleep(0.1)
+                        time.sleep(0.08)
                         stopMotor()
                         grab()
                         doingTask = False
@@ -242,6 +240,8 @@ def goToObject(result):
                     doingTask = False
                     print('not in front of robot')
                 break
+            else:
+                rotate()
         if dropping:
             if bb['label'] == 'basket':
                 minRange = (width/2)-40#(bb['width']/2)-150
@@ -342,7 +342,18 @@ def alignRobot(midPoint ,minRange, maxRange):
         time.sleep(0.1)
         stopMotor()
 
+def rotate():
+    p.ChangeDutyCycle(25)
+    p2.ChangeDutyCycle(25)
+    goLeft()
+    time.sleep(0.1)
+    stopMotor()
+    time.sleep(0.35)
+
 
 if __name__ == "__main__":
+    global dropping, searching
+    searching = True
+    dropping = False
     main(sys.argv[1:])
     GPIO.cleanup()
