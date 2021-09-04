@@ -74,8 +74,12 @@ p4=GPIO.PWM(en4,1000)
 p4.start(25)
 
 ir = 36
-GPIO.setup(ir,GPIO.IN)
+ir2 = 37
+ir3 = 38
 
+GPIO.setup(ir,GPIO.IN)
+GPIO.setup(ir2,GPIO.IN)
+GPIO.setup(ir3,GPIO.IN)
 
 def now():
     return round(time.time() * 1000)
@@ -213,10 +217,15 @@ def goToObject(result):
                     doingTask = True
                     print('in front of robot')
                     while True:
-                        if GPIO.input(ir):
+                        if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
                             goForward()
                             # time.sleep(0.4)
                             # stopMotor()
+                        elif not GPIO.input(ir2):
+                            goLeft()
+                            time.sleep(0.1)
+                            stopMotor()
+                            grab()
                         else:
                             stopMotor()
                             goBack()
