@@ -1,6 +1,3 @@
-from ultrasonic import USSensor as us
-from motor import Motor as m
-from grabber import Grabber as g
 import RPi.GPIO as GPIO
 import time
 import sys
@@ -23,6 +20,7 @@ taskDone = False
 doingTask = False
 recheck = True
 startTime = 0
+time1 = 0
 x = 0
 
 in1 = 16
@@ -114,7 +112,7 @@ def help():
     print('python classify.py <modelPath> <Camera port ID, only required when more than 1 camera is present>')
 
 def main(argv):
-    global found
+    global found, time1
     try:
         opts, args = getopt.getopt(argv, "h", ["--help"])
     except getopt.GetoptError:
@@ -220,45 +218,45 @@ def goToObject(result):
                         if x == 0:
                             startTime = time.time()
                             x+=1
-                        if time.time() - startTime < 4:
+                        if time.time() - startTime < 5:
                             break
                         else:
                             recheck = False
-                        flag = True
-                        break
-                    if flag:
-                        break
-                    while True:
+                        #flag = True
+                        #break
+                    #if flag:
+                    #    break
+                    while not recheck:
                         #print(GPIO.input(ir))
                         #print(GPIO.input(ir2))
                         #print(GPIO.input(ir3))
                         if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
-                            print('case 1')
+                            #print('case 1')
                             goForward()
                         elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
                             print('case 2')
-                            while GPIO.input(ir2) and not GPIO.input(ir):
+                            while GPIO.input(ir):# and not GPIO.input(ir2):
                                 goLeft()
                             stopMotor()
                             grab()
                             break
                         elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
                             print('case 3')
-                            while GPIO.input(ir2) and not GPIO.input(ir):
+                            while GPIO.input(ir):# and not GPIO.input(ir2):
                                 goLeft()
                             stopMotor()
                             grab()
                             break
                         elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
                             print('case 4')
-                            while GPIO.input(ir3) and not GPIO.input(ir):
+                            while GPIO.input(ir):# and not GPIO.input(ir3):
                                 goRight()
                             stopMotor()
                             grab()
                             break
                         elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
                             print('case 5')
-                            while GPIO.input(ir3) and not GPIO.input(ir):
+                            while GPIO.input(ir):# and not GPIO.input(ir3):
                                 goRight()
                             stopMotor()
                             grab()
