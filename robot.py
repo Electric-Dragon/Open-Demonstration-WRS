@@ -220,7 +220,7 @@ def goToObject(result):
                         if x == 0:
                             startTime = time.time()
                             x+=1
-                        if time.time() - startTime < 3:
+                        if time.time() - startTime < 4:
                             break
                         else:
                             recheck = False
@@ -253,7 +253,6 @@ def goToObject(result):
                             print('case 4')
                             while GPIO.input(ir3) and not GPIO.input(ir):
                                 goRight()
-                            #time.sleep(0.15)
                             stopMotor()
                             grab()
                             break
@@ -261,7 +260,6 @@ def goToObject(result):
                             print('case 5')
                             while GPIO.input(ir3) and not GPIO.input(ir):
                                 goRight()
-                            #time.sleep(0.05)
                             stopMotor()
                             grab()
                             break
@@ -318,12 +316,16 @@ def goBack():
     GPIO.output(in4,GPIO.HIGH)
 
 def goRight():
+    p.ChangeDutyCycle(25)
+    p2.ChangeDutyCycle(25)
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
 
 def goLeft():
+    p.ChangeDutyCycle(25)
+    p2.ChangeDutyCycle(25)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.LOW)
@@ -336,7 +338,7 @@ def stopMotor():
     GPIO.output(in4,GPIO.LOW)
 
 def grab():
-    global found, doingTask, searching, dropping
+    global found, doingTask, searching, dropping, x
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
     time.sleep(0.4)
@@ -356,6 +358,7 @@ def grab():
     GPIO.output(in6,GPIO.LOW)
     found = False
     doingTask = False
+    x = 0
     dropping = not dropping
     searching = not searching
 
@@ -367,9 +370,10 @@ def drop():
     GPIO.output(in8,GPIO.LOW)
 
 def alignRobot(midPoint ,minRange, maxRange):
-    time.sleep(0.4)
-    p.ChangeDutyCycle(25)
-    p2.ChangeDutyCycle(25)
+    global recheck, x
+    # time.sleep(0.4)
+    # p.ChangeDutyCycle(25)
+    # p2.ChangeDutyCycle(25)
     if midPoint < minRange:
         goLeft()
         time.sleep(0.1)
@@ -378,15 +382,15 @@ def alignRobot(midPoint ,minRange, maxRange):
         goRight()
         time.sleep(0.1)
         stopMotor()
+    recheck = True
+    x = 0
 
 def rotate():
-    time.sleep(0.1)
-    p.ChangeDutyCycle(25)
-    p2.ChangeDutyCycle(25)
+    # p.ChangeDutyCycle(25)
+    # p2.ChangeDutyCycle(25)
     goLeft()
     time.sleep(0.1)
     stopMotor()
-    time.sleep(0.35)
 
 def reachObject():
     if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
