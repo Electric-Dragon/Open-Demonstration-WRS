@@ -220,7 +220,7 @@ def goToObject(result):
                         if x == 0:
                             startTime = time.time()
                             x+=1
-                        if time.time() - startTime < 2:
+                        if time.time() - startTime < 3:
                             break
                         else:
                             recheck = False
@@ -229,9 +229,9 @@ def goToObject(result):
                     if flag:
                         break
                     while True:
-                        print(GPIO.input(ir))
-                        print(GPIO.input(ir2))
-                        print(GPIO.input(ir3))
+                        #print(GPIO.input(ir))
+                        #print(GPIO.input(ir2))
+                        #print(GPIO.input(ir3))
                         if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
                             print('case 1')
                             goForward()
