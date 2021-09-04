@@ -166,7 +166,7 @@ def main(argv):
                 else:
                     raise Exception("Couldn't initialize selected camera.")
 
-                next_frame = 0 # limit to ~10 fps here
+                next_frame = 0
 
                 for res, img in runner.classifier(videoCaptureDeviceId):
                     if (next_frame > now()):
@@ -186,9 +186,6 @@ def main(argv):
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
                         goToObject(res)
                         for bb in res["result"]["bounding_boxes"]:
-                            # if bb['label'] == 'raspberry-pi':
-                            #     count+=1
-                            #     print('Spotted Raspberry Pi ' + str(count) + ' times!')
                             print('\t%s (%.2f): x=%d y=%d w=%d h=%d' % (bb['label'], bb['value'], bb['x'], bb['y'], bb['width'], bb['height']))
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
                     if (show_camera):
@@ -203,7 +200,7 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    global searching, dropping
+    global searching, dropping, doingTask
     time.sleep(0.4)
     result = result['result']['bounding_boxes']
     for bb in result:
@@ -216,42 +213,10 @@ def goToObject(result):
                 if midPoint >= minRange and midPoint <= maxRange:
                     doingTask = True
                     print('in front of robot')
-<<<<<<< HEAD
-                    while True:
-                        if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
-                            goForward()
-                            # time.sleep(0.4)
-                            # stopMotor()
-                        elif not GPIO.input(ir2):
-                            goLeft()
-                            time.sleep(0.1)
-                            stopMotor()
-                            grab()
-                        else:
-                            stopMotor()
-                            goBack()
-                            time.sleep(0.08)
-                            stopMotor()
-                            grab()
-                            doingTask = False
-                            dropping = True
-                            searching = False
-                            break
-=======
-                    if GPIO.input(ir):
-                        goForward()
-                        # time.sleep(0.4)
-                        # stopMotor()
-                    else:
-                        stopMotor()
-                        goBack()
-                        time.sleep(0.08)
-                        stopMotor()
-                        grab()
-                        doingTask = False
-                        dropping = True
-                        searching = False
->>>>>>> 2862aa9e22063755eec1be2af265853046608961
+                    reachObject()
+                    doingTask = False
+                    dropping = True
+                    searching = False
                     break
 
                 else:
@@ -263,33 +228,23 @@ def goToObject(result):
                 rotate()
         if dropping:
             if bb['label'] == 'basket':
-                minRange = (width/2)-40#(bb['width']/2)-150
-                maxRange = (width/2)+40#(bb['width']/2)+25
+                minRange = (width/2)-40
+                maxRange = (width/2)+40
                 midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
                     doingTask = True
                     print('in front of robot')
-                    if GPIO.input(ir):
-                        goForward()
-                    else:
-                        stopMotor()
-                        goBack()
-                        time.sleep(0.1)
-                        stopMotor()
-                        drop()
-                        doingTask = False
-                        dropping = False
-                        searching = True
+                    reachObject()
+                    doingTask = False
+                    dropping = False
+                    searching = True
                     break
-
                 else:
                     alignRobot(midPoint, minRange, maxRange)
                     doingTask = False
                     print('not in front of robot')
                 break
-
-    #print(type(result))
 
 def goForward():
     p.ChangeDutyCycle(50)
@@ -370,6 +325,38 @@ def rotate():
     time.sleep(0.1)
     stopMotor()
     time.sleep(0.35)
+
+def reachObject():
+    if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
+        goForward()
+        # time.sleep(0.4)
+        # stopMotor()
+    elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
+        goLeft()
+        time.sleep(0.1)
+        stopMotor()
+        grab()
+    elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
+        goLeft()
+        time.sleep(0.05)
+        stopMotor()
+        grab()
+    elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
+        goRight()
+        time.sleep(0.1)
+        stopMotor()
+        grab()
+    elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
+        goRight()
+        time.sleep(0.05)
+        stopMotor()
+        grab()
+    else:
+        stopMotor()
+        goBack()
+        time.sleep(0.08)
+        stopMotor()
+        grab()
 
 
 if __name__ == "__main__":
