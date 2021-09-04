@@ -216,6 +216,7 @@ def goToObject(result):
                 if midPoint >= minRange and midPoint <= maxRange:
                     doingTask = True
                     print('in front of robot')
+<<<<<<< HEAD
                     while True:
                         if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
                             goForward()
@@ -236,6 +237,21 @@ def goToObject(result):
                             dropping = True
                             searching = False
                             break
+=======
+                    if GPIO.input(ir):
+                        goForward()
+                        # time.sleep(0.4)
+                        # stopMotor()
+                    else:
+                        stopMotor()
+                        goBack()
+                        time.sleep(0.08)
+                        stopMotor()
+                        grab()
+                        doingTask = False
+                        dropping = True
+                        searching = False
+>>>>>>> 2862aa9e22063755eec1be2af265853046608961
                     break
 
                 else:
