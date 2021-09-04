@@ -16,13 +16,14 @@ GPIO.setmode(GPIO.BOARD)
 runner = None
 show_camera = True
 
-#global dropping, searching
 searching = True
 dropping = False
 found = False
 taskDone = False
-global doingTask
 doingTask = False
+recheck = True
+startTime = 0
+x = 0
 
 in1 = 16
 in2 = 18
@@ -71,7 +72,7 @@ GPIO.setup(en4,GPIO.OUT)
 GPIO.output(in7,GPIO.LOW)
 GPIO.output(in8,GPIO.LOW)
 p4=GPIO.PWM(en4,1000)
-p4.start(25)
+p4.start(28)
 
 ir = 36
 ir2 = 37
@@ -113,6 +114,7 @@ def help():
     print('python classify.py <modelPath> <Camera port ID, only required when more than 1 camera is present>')
 
 def main(argv):
+    global found
     try:
         opts, args = getopt.getopt(argv, "h", ["--help"])
     except getopt.GetoptError:
@@ -135,7 +137,7 @@ def main(argv):
 
     print('MODEL: ' + modelfile)
 
-    if searching or dropping:
+    if searching or dropping and not found:
         with ImageImpulseRunner(modelfile) as runner:
             try:
                 count = 0
@@ -200,8 +202,8 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    global searching, dropping, doingTask
-    time.sleep(0.4)
+    global searching, dropping, doingTask, found, recheck, x, startTime
+    flag = False
     result = result['result']['bounding_boxes']
     for bb in result:
         if searching:
@@ -211,13 +213,66 @@ def goToObject(result):
                 midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
+                    found = True
                     doingTask = True
                     print('in front of robot')
-                    reachObject()
-                    doingTask = False
-                    dropping = True
-                    searching = False
-                    break
+                    if recheck:
+                        if x == 0:
+                            startTime = time.time()
+                            x+=1
+                        if time.time() - startTime < 2:
+                            break
+                        else:
+                            recheck = False
+                        flag = True
+                        break
+                    if flag:
+                        break
+                    while True:
+                        print(GPIO.input(ir))
+                        print(GPIO.input(ir2))
+                        print(GPIO.input(ir3))
+                        if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
+                            print('case 1')
+                            goForward()
+                        elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
+                            print('case 2')
+                            while GPIO.input(ir2) and not GPIO.input(ir):
+                                goLeft()
+                            stopMotor()
+                            grab()
+                            break
+                        elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
+                            print('case 3')
+                            while GPIO.input(ir2) and not GPIO.input(ir):
+                                goLeft()
+                            stopMotor()
+                            grab()
+                            break
+                        elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
+                            print('case 4')
+                            while GPIO.input(ir3) and not GPIO.input(ir):
+                                goRight()
+                            #time.sleep(0.15)
+                            stopMotor()
+                            grab()
+                            break
+                        elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
+                            print('case 5')
+                            while GPIO.input(ir3) and not GPIO.input(ir):
+                                goRight()
+                            #time.sleep(0.05)
+                            stopMotor()
+                            grab()
+                            break
+                        #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
+                        #    print('case 6')
+                        #    stopMotor()
+                        #    goBack()
+                        #    time.sleep(0.08)
+                        #    stopMotor()
+                        #    grab()
+                        #    break
 
                 else:
                     alignRobot(midPoint, minRange, maxRange)
@@ -233,6 +288,7 @@ def goToObject(result):
                 midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
+                    found = True
                     doingTask = True
                     print('in front of robot')
                     reachObject()
@@ -245,6 +301,7 @@ def goToObject(result):
                     doingTask = False
                     print('not in front of robot')
                 break
+    time.sleep(0.4)
 
 def goForward():
     p.ChangeDutyCycle(50)
@@ -279,6 +336,7 @@ def stopMotor():
     GPIO.output(in4,GPIO.LOW)
 
 def grab():
+    global found, doingTask, searching, dropping
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
     time.sleep(0.4)
@@ -286,7 +344,7 @@ def grab():
     GPIO.output(in6,GPIO.LOW)
     GPIO.output(in7,GPIO.HIGH)
     GPIO.output(in8,GPIO.LOW)
-    time.sleep(2)
+    time.sleep(2.3)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
     p3.ChangeDutyCycle(50)
@@ -296,6 +354,10 @@ def grab():
     p3.ChangeDutyCycle(25)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
+    found = False
+    doingTask = False
+    dropping = not dropping
+    searching = not searching
 
 def drop():
     GPIO.output(in7,GPIO.LOW)
@@ -305,7 +367,7 @@ def drop():
     GPIO.output(in8,GPIO.LOW)
 
 def alignRobot(midPoint ,minRange, maxRange):
-    #time.sleep(0.4)
+    time.sleep(0.4)
     p.ChangeDutyCycle(25)
     p2.ChangeDutyCycle(25)
     if midPoint < minRange:
