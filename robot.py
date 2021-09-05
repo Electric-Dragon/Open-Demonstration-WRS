@@ -70,7 +70,7 @@ GPIO.setup(en4,GPIO.OUT)
 GPIO.output(in7,GPIO.LOW)
 GPIO.output(in8,GPIO.LOW)
 p4=GPIO.PWM(en4,1000)
-p4.start(28)
+p4.start(32)
 
 ir = 36
 ir2 = 37
@@ -207,8 +207,8 @@ def goToObject(result):
     for bb in result:
         if searching:
             if bb['label'] == 'cloth':
-                minRange = (width/2)-40#(bb['width']/2)-150
-                maxRange = (width/2)+40#(bb['width']/2)+25
+                minRange = (width/2)-40
+                maxRange = (width/2)+40
                 midPoint = bb['x']+(bb['width']/2)
                 print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
                 if midPoint >= minRange and midPoint <= maxRange:
@@ -312,28 +312,28 @@ def goToObject(result):
                             while GPIO.input(ir):# and not GPIO.input(ir2):
                                 goLeft()
                             stopMotor()
-                            grab()
+                            drop()
                             break
                         elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
                             print('case 3')
                             while GPIO.input(ir) and not GPIO.input(ir2):
                                 goLeft()
                             stopMotor()
-                            grab()
+                            drop()
                             break
                         elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
                             print('case 4')
                             while GPIO.input(ir):# and not GPIO.input(ir3):
                                 goRight()
                             stopMotor()
-                            grab()
+                            drop()
                             break
                         elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
                             print('case 5')
                             while GPIO.input(ir) and not GPIO.input(ir3):
                                 goRight()
                             stopMotor()
-                            grab()
+                            drop()
                             break
                         #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
                         #    print('case 6')
@@ -427,6 +427,7 @@ def grab():
     searching = not searching
 
 def drop():
+    p4.ChangeDutyCycle(28)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.HIGH)
     time.sleep(0.5)
@@ -455,38 +456,7 @@ def rotate():
     goLeft()
     time.sleep(0.1)
     stopMotor()
-
-def reachObject():
-    if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
-        goForward()
-        # time.sleep(0.4)
-        # stopMotor()
-    elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
-        goLeft()
-        time.sleep(0.1)
-        stopMotor()
-        grab()
-    elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
-        goLeft()
-        time.sleep(0.05)
-        stopMotor()
-        grab()
-    elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
-        goRight()
-        time.sleep(0.1)
-        stopMotor()
-        grab()
-    elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
-        goRight()
-        time.sleep(0.05)
-        stopMotor()
-        grab()
-    else:
-        stopMotor()
-        goBack()
-        time.sleep(0.08)
-        stopMotor()
-        grab()
+    #time.sleep(2)
 
 
 if __name__ == "__main__":
