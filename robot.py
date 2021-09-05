@@ -71,7 +71,7 @@ GPIO.setup(en4,GPIO.OUT)
 GPIO.output(in7,GPIO.LOW)
 GPIO.output(in8,GPIO.LOW)
 p4=GPIO.PWM(en4,1000)
-p4.start(32)
+p4.start(50)
 
 ir = 36
 ir2 = 37
@@ -203,9 +203,8 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    # time.sleep(0.3)
     global searching, dropping, doingTask, found, recheck, x, startTime, startTime2, y
-    if time.time() - startTime2 >= 1:
+    if time.time() - startTime2 >= 2.5:
         y = 0
         result = result['result']['bounding_boxes']
         for bb in result:
@@ -304,10 +303,20 @@ def goToObject(result):
                             #break
                         #if flag:
                         #    break
+                        p4.ChangeDutyCycle(60)
+                        GPIO.output(in7,GPIO.HIGH)
+                        GPIO.output(in8,GPIO.LOW)
+                        time.sleep(0.2)
+                        GPIO.output(in7,GPIO.LOW)
+                        GPIO.output(in8,GPIO.LOW)
+                        p3.ChangeDutyCycle(50)
+                        GPIO.output(in5,GPIO.LOW)
+                        GPIO.output(in6,GPIO.HIGH)
+                        time.sleep(0.4)
+                        GPIO.output(in5,GPIO.LOW)
+                        GPIO.output(in6,GPIO.LOW)
+                        p3.ChangeDutyCycle(25)
                         while not recheck:
-                            #print(GPIO.input(ir))
-                            #print(GPIO.input(ir2))
-                            #print(GPIO.input(ir3))
                             if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
                                 #print('case 1')
                                 goForward()
@@ -339,38 +348,16 @@ def goToObject(result):
                                 stopMotor()
                                 drop()
                                 break
-                            #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
-                            #    print('case 6')
-                            #    stopMotor()
-                            #    goBack()
-                            #    time.sleep(0.08)
-                            #    stopMotor()
-                            #    grab()
-                            #    break
 
                     else:
                         alignRobot(midPoint, minRange, maxRange)
                         doingTask = False
                         print('not in front of robot')
                     break
-                    # if midPoint >= minRange and midPoint <= maxRange:
-                    #     found = True
-                    #     doingTask = True
-                    #     print('in front of robot')
-                    #     reachObject()
-                    #     doingTask = False
-                    #     dropping = False
-                    #     searching = True
-                    #     break
-                    # else:
-                    #     alignRobot(midPoint, minRange, maxRange)
-                    #     doingTask = False
-                    #     print('not in front of robot')
-                    # break
         time.sleep(0.4)
 
 def goForward():
-    p.ChangeDutyCycle(50)
+    p.ChangeDutyCycle(46)
     p2.ChangeDutyCycle(40)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
@@ -407,6 +394,10 @@ def stopMotor():
 
 def grab():
     global found, doingTask, searching, dropping, x
+    goBack()
+    time.sleep(0.2)
+    stopMotor()
+    p4.ChangeDutyCycle(60)
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
     time.sleep(0.4)
@@ -437,6 +428,9 @@ def drop():
     time.sleep(0.5)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
+    goBack()
+    time.sleep(0.7)
+    stopMotor()
 
 def alignRobot(midPoint ,minRange, maxRange):
     global recheck, x
