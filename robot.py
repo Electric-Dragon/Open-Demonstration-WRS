@@ -20,8 +20,9 @@ taskDone = False
 doingTask = False
 recheck = True
 startTime = 0
-time1 = 0
+startTime2 = 0
 x = 0
+y = 0
 
 in1 = 16
 in2 = 18
@@ -112,7 +113,7 @@ def help():
     print('python classify.py <modelPath> <Camera port ID, only required when more than 1 camera is present>')
 
 def main(argv):
-    global found, time1
+    global found, y, startTime2
     try:
         opts, args = getopt.getopt(argv, "h", ["--help"])
     except getopt.GetoptError:
@@ -138,7 +139,6 @@ def main(argv):
     if searching or dropping and not found:
         with ImageImpulseRunner(modelfile) as runner:
             try:
-                count = 0
                 model_info = runner.init()
                 print('Loaded runner for "' + model_info['project']['owner'] + ' / ' + model_info['project']['name'] + '"')
                 labels = model_info['model_parameters']['labels']
@@ -183,6 +183,9 @@ def main(argv):
                         if len(res['result']['bounding_boxes']) == 0:
                             if not doingTask:
                                 rotate()
+                        if y == 0:
+                            startTime2 = time.time()
+                            y = 1
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
                         goToObject(res)
                         for bb in res["result"]["bounding_boxes"]:
@@ -200,170 +203,171 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    time.sleep(0.3)
-    global searching, dropping, doingTask, found, recheck, x, startTime
-    flag = False
-    result = result['result']['bounding_boxes']
-    for bb in result:
-        if searching:
-            if bb['label'] == 'cloth':
-                minRange = (width/2)-40
-                maxRange = (width/2)+40
-                midPoint = bb['x']+(bb['width']/2)
-                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
-                if midPoint >= minRange and midPoint <= maxRange:
-                    found = True
-                    doingTask = True
-                    print('in front of robot')
-                    if recheck:
-                        if x == 0:
-                            startTime = time.time()
-                            x+=1
-                        if time.time() - startTime < 5:
-                            break
-                        else:
-                            recheck = False
-                        #flag = True
-                        #break
-                    #if flag:
-                    #    break
-                    while not recheck:
-                        #print(GPIO.input(ir))
-                        #print(GPIO.input(ir2))
-                        #print(GPIO.input(ir3))
-                        if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
-                            #print('case 1')
-                            goForward()
-                        elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
-                            print('case 2')
-                            while GPIO.input(ir):# and not GPIO.input(ir2):
-                                goLeft()
-                            stopMotor()
-                            grab()
-                            break
-                        elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
-                            print('case 3')
-                            while GPIO.input(ir):# and not GPIO.input(ir2):
-                                goLeft()
-                            stopMotor()
-                            grab()
-                            break
-                        elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
-                            print('case 4')
-                            while GPIO.input(ir):# and not GPIO.input(ir3):
-                                goRight()
-                            stopMotor()
-                            grab()
-                            break
-                        elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
-                            print('case 5')
-                            while GPIO.input(ir):# and not GPIO.input(ir3):
-                                goRight()
-                            stopMotor()
-                            grab()
-                            break
-                        #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
-                        #    print('case 6')
-                        #    stopMotor()
-                        #    goBack()
-                        #    time.sleep(0.08)
-                        #    stopMotor()
-                        #    grab()
+    # time.sleep(0.3)
+    global searching, dropping, doingTask, found, recheck, x, startTime, startTime2, y
+    if time.time() - startTime2 >= 1:
+        y = 0
+        result = result['result']['bounding_boxes']
+        for bb in result:
+            if searching:
+                if bb['label'] == 'cloth':
+                    minRange = (width/2)-40
+                    maxRange = (width/2)+40
+                    midPoint = bb['x']+(bb['width']/2)
+                    print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
+                    if midPoint >= minRange and midPoint <= maxRange:
+                        found = True
+                        doingTask = True
+                        print('in front of robot')
+                        if recheck:
+                            if x == 0:
+                                startTime = time.time()
+                                x+=1
+                            if time.time() - startTime < 3:
+                                break
+                            else:
+                                recheck = False
+                            #flag = True
+                            #break
+                        #if flag:
                         #    break
+                        while not recheck:
+                            #print(GPIO.input(ir))
+                            #print(GPIO.input(ir2))
+                            #print(GPIO.input(ir3))
+                            if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
+                                #print('case 1')
+                                goForward()
+                            elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
+                                print('case 2')
+                                while GPIO.input(ir):# and not GPIO.input(ir2):
+                                    goLeft()
+                                stopMotor()
+                                grab()
+                                break
+                            elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
+                                print('case 3')
+                                while GPIO.input(ir):# and not GPIO.input(ir2):
+                                    goLeft()
+                                stopMotor()
+                                grab()
+                                break
+                            elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
+                                print('case 4')
+                                while GPIO.input(ir):# and not GPIO.input(ir3):
+                                    goRight()
+                                stopMotor()
+                                grab()
+                                break
+                            elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
+                                print('case 5')
+                                while GPIO.input(ir):# and not GPIO.input(ir3):
+                                    goRight()
+                                stopMotor()
+                                grab()
+                                break
+                            #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
+                            #    print('case 6')
+                            #    stopMotor()
+                            #    goBack()
+                            #    time.sleep(0.08)
+                            #    stopMotor()
+                            #    grab()
+                            #    break
 
+                    else:
+                        alignRobot(midPoint, minRange, maxRange)
+                        doingTask = False
+                        print('not in front of robot')
+                    break
                 else:
-                    alignRobot(midPoint, minRange, maxRange)
-                    doingTask = False
-                    print('not in front of robot')
-                break
-            else:
-                rotate()
-        if dropping:
-            if bb['label'] == 'basket':
-                minRange = (width/2)-40
-                maxRange = (width/2)+40
-                midPoint = bb['x']+(bb['width']/2)
-                print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
-                if midPoint >= minRange and midPoint <= maxRange:
-                    found = True
-                    doingTask = True
-                    print('in front of robot')
-                    if recheck:
-                        if x == 0:
-                            startTime = time.time()
-                            x+=1
-                        if time.time() - startTime < 5:
-                            break
-                        else:
-                            recheck = False
-                        #flag = True
-                        #break
-                    #if flag:
-                    #    break
-                    while not recheck:
-                        #print(GPIO.input(ir))
-                        #print(GPIO.input(ir2))
-                        #print(GPIO.input(ir3))
-                        if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
-                            #print('case 1')
-                            goForward()
-                        elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
-                            print('case 2')
-                            while GPIO.input(ir):# and not GPIO.input(ir2):
-                                goLeft()
-                            stopMotor()
-                            drop()
-                            break
-                        elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
-                            print('case 3')
-                            while GPIO.input(ir) and not GPIO.input(ir2):
-                                goLeft()
-                            stopMotor()
-                            drop()
-                            break
-                        elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
-                            print('case 4')
-                            while GPIO.input(ir):# and not GPIO.input(ir3):
-                                goRight()
-                            stopMotor()
-                            drop()
-                            break
-                        elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
-                            print('case 5')
-                            while GPIO.input(ir) and not GPIO.input(ir3):
-                                goRight()
-                            stopMotor()
-                            drop()
-                            break
-                        #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
-                        #    print('case 6')
-                        #    stopMotor()
-                        #    goBack()
-                        #    time.sleep(0.08)
-                        #    stopMotor()
-                        #    grab()
+                    rotate()
+            if dropping:
+                if bb['label'] == 'basket':
+                    minRange = (width/2)-40
+                    maxRange = (width/2)+40
+                    midPoint = bb['x']+(bb['width']/2)
+                    print('minRange',minRange,'x',bb['x'],'x+width',bb['x']+bb['width'],'maxRange',maxRange, 'x+width/2',bb['x']+(bb['width']/2))
+                    if midPoint >= minRange and midPoint <= maxRange:
+                        found = True
+                        doingTask = True
+                        print('in front of robot')
+                        if recheck:
+                            if x == 0:
+                                startTime = time.time()
+                                x+=1
+                            if time.time() - startTime < 5:
+                                break
+                            else:
+                                recheck = False
+                            #flag = True
+                            #break
+                        #if flag:
                         #    break
+                        while not recheck:
+                            #print(GPIO.input(ir))
+                            #print(GPIO.input(ir2))
+                            #print(GPIO.input(ir3))
+                            if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
+                                #print('case 1')
+                                goForward()
+                            elif GPIO.input(ir) and GPIO.input(ir3) and not GPIO.input(ir2):
+                                print('case 2')
+                                while GPIO.input(ir):# and not GPIO.input(ir2):
+                                    goLeft()
+                                stopMotor()
+                                drop()
+                                break
+                            elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
+                                print('case 3')
+                                while GPIO.input(ir) and not GPIO.input(ir2):
+                                    goLeft()
+                                stopMotor()
+                                drop()
+                                break
+                            elif GPIO.input(ir) and GPIO.input(ir2) and not GPIO.input(ir3):
+                                print('case 4')
+                                while GPIO.input(ir):# and not GPIO.input(ir3):
+                                    goRight()
+                                stopMotor()
+                                drop()
+                                break
+                            elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
+                                print('case 5')
+                                while GPIO.input(ir) and not GPIO.input(ir3):
+                                    goRight()
+                                stopMotor()
+                                drop()
+                                break
+                            #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
+                            #    print('case 6')
+                            #    stopMotor()
+                            #    goBack()
+                            #    time.sleep(0.08)
+                            #    stopMotor()
+                            #    grab()
+                            #    break
 
-                else:
-                    alignRobot(midPoint, minRange, maxRange)
-                    doingTask = False
-                    print('not in front of robot')
-                break
-                # if midPoint >= minRange and midPoint <= maxRange:
-                #     found = True
-                #     doingTask = True
-                #     print('in front of robot')
-                #     reachObject()
-                #     doingTask = False
-                #     dropping = False
-                #     searching = True
-                #     break
-                # else:
-                #     alignRobot(midPoint, minRange, maxRange)
-                #     doingTask = False
-                #     print('not in front of robot')
-                # break
-    time.sleep(0.4)
+                    else:
+                        alignRobot(midPoint, minRange, maxRange)
+                        doingTask = False
+                        print('not in front of robot')
+                    break
+                    # if midPoint >= minRange and midPoint <= maxRange:
+                    #     found = True
+                    #     doingTask = True
+                    #     print('in front of robot')
+                    #     reachObject()
+                    #     doingTask = False
+                    #     dropping = False
+                    #     searching = True
+                    #     break
+                    # else:
+                    #     alignRobot(midPoint, minRange, maxRange)
+                    #     doingTask = False
+                    #     print('not in front of robot')
+                    # break
+        time.sleep(0.4)
 
 def goForward():
     p.ChangeDutyCycle(50)
