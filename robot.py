@@ -200,6 +200,7 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
+    time.sleep(0.3)
     global searching, dropping, doingTask, found, recheck, x, startTime
     flag = False
     result = result['result']['bounding_boxes']
@@ -315,7 +316,7 @@ def goToObject(result):
                             break
                         elif GPIO.input(ir3) and not GPIO.input(ir) and not GPIO.input(ir2):
                             print('case 3')
-                            while GPIO.input(ir):# and not GPIO.input(ir2):
+                            while GPIO.input(ir) and not GPIO.input(ir2):
                                 goLeft()
                             stopMotor()
                             grab()
@@ -329,7 +330,7 @@ def goToObject(result):
                             break
                         elif GPIO.input(ir2) and not GPIO.input(ir) and not GPIO.input(ir3):
                             print('case 5')
-                            while GPIO.input(ir):# and not GPIO.input(ir3):
+                            while GPIO.input(ir) and not GPIO.input(ir3):
                                 goRight()
                             stopMotor()
                             grab()
@@ -379,16 +380,16 @@ def goBack():
     GPIO.output(in4,GPIO.HIGH)
 
 def goRight():
-    p.ChangeDutyCycle(25)
-    p2.ChangeDutyCycle(25)
+    p.ChangeDutyCycle(30)
+    p2.ChangeDutyCycle(30)
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
 
 def goLeft():
-    p.ChangeDutyCycle(25)
-    p2.ChangeDutyCycle(25)
+    p.ChangeDutyCycle(30)
+    p2.ChangeDutyCycle(30)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.LOW)
