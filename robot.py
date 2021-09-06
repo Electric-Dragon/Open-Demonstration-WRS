@@ -402,6 +402,11 @@ def grab():
     p3.ChangeDutyCycle(25)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
+    GPIO.output(in7,GPIO.HIGH)
+    GPIO.output(in8,GPIO.LOW)
+    time.sleep(0.2)
+    GPIO.output(in7,GPIO.LOW)
+    GPIO.output(in8,GPIO.LOW)
     found = False
     doingTask = False
     x = 0
