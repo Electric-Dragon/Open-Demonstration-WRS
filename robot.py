@@ -265,15 +265,6 @@ def goToObject(result):
                                 stopMotor()
                                 grab()
                                 break
-                            #elif GPIO.input(ir2) and GPIO.input(ir3) and not GPIO.input(ir):
-                            #    print('case 6')
-                            #    stopMotor()
-                            #    goBack()
-                            #    time.sleep(0.08)
-                            #    stopMotor()
-                            #    grab()
-                            #    break
-
                     else:
                         alignRobot(midPoint, minRange, maxRange)
                         doingTask = False
@@ -299,10 +290,6 @@ def goToObject(result):
                                 break
                             else:
                                 recheck = False
-                            #flag = True
-                            #break
-                        #if flag:
-                        #    break
                         p4.ChangeDutyCycle(60)
                         GPIO.output(in7,GPIO.HIGH)
                         GPIO.output(in8,GPIO.LOW)
@@ -422,6 +409,7 @@ def grab():
     searching = not searching
 
 def drop():
+    global found, doingTask, searching, dropping, x
     p4.ChangeDutyCycle(28)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.HIGH)
@@ -431,6 +419,11 @@ def drop():
     goBack()
     time.sleep(0.7)
     stopMotor()
+    found = False
+    doingTask = False
+    x = 0
+    dropping = not dropping
+    searching = not searching
 
 def alignRobot(midPoint ,minRange, maxRange):
     global recheck, x
