@@ -344,7 +344,7 @@ def goToObject(result):
         time.sleep(0.4)
 
 def goForward():
-    p.ChangeDutyCycle(46)
+    p.ChangeDutyCycle(50)
     p2.ChangeDutyCycle(40)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
