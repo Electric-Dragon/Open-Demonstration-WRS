@@ -81,6 +81,8 @@ GPIO.setup(ir,GPIO.IN)
 GPIO.setup(ir2,GPIO.IN)
 GPIO.setup(ir3,GPIO.IN)
 
+d = 'l'
+
 def now():
     return round(time.time() * 1000)
 
@@ -180,9 +182,13 @@ def main(argv):
                         print('', flush=True)
 
                     elif "bounding_boxes" in res["result"].keys():
+                        if dropping:
+                            d = 'r'
+                        else:
+                            d='l'
                         if len(res['result']['bounding_boxes']) == 0:
                             if not doingTask:
-                                rotate()
+                                rotate(d)
                         if y == 0:
                             startTime2 = time.time()
                             y = 1
@@ -307,6 +313,10 @@ def goToObject(result):
                         GPIO.output(in5,GPIO.LOW)
                         GPIO.output(in6,GPIO.LOW)
                         p3.ChangeDutyCycle(25)
+                        goRight()
+                        time.sleep(0.15)
+                        stopMotor()
+                        time.sleep(0.05)
                         while not recheck:
                             if GPIO.input(ir) and GPIO.input(ir2) and GPIO.input(ir3):
                                 #print('case 1')
@@ -346,7 +356,7 @@ def goToObject(result):
                         print('not in front of robot')
                     break
                 else:
-                    rotate()
+                    rotate('r')
         time.sleep(0.4)
 
 def goForward():
@@ -425,7 +435,7 @@ def drop():
     p4.ChangeDutyCycle(28)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.HIGH)
-    time.sleep(0.5)
+    time.sleep(0.8)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
     time.sleep(0.1)
@@ -464,7 +474,10 @@ def alignRobot(midPoint ,minRange, maxRange):
 def rotate(d = 'l'):
     # p.ChangeDutyCycle(25)
     # p2.ChangeDutyCycle(25)
-    goLeft()
+    if d == 'l':
+        goLeft()
+    else:
+        goRight()
     time.sleep(0.1)
     stopMotor()
     #time.sleep(2)
