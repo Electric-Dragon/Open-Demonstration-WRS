@@ -230,6 +230,10 @@ def goToObject(result):
                             #break
                         #if flag:
                         #    break
+                        goRight()
+                        time.sleep(0.15)
+                        stopMotor()
+                        time.sleep(0.05)
                         while not recheck:
                             #print(GPIO.input(ir))
                             #print(GPIO.input(ir2))
@@ -341,6 +345,8 @@ def goToObject(result):
                         doingTask = False
                         print('not in front of robot')
                     break
+                else:
+                    rotate()
         time.sleep(0.4)
 
 def goForward():
@@ -382,7 +388,7 @@ def stopMotor():
 def grab():
     global found, doingTask, searching, dropping, x
     goBack()
-    time.sleep(0.2)
+    time.sleep(0.1)
     stopMotor()
     p4.ChangeDutyCycle(60)
     GPIO.output(in5,GPIO.HIGH)
@@ -402,6 +408,7 @@ def grab():
     p3.ChangeDutyCycle(25)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
+    time.sleep(0.1)
     GPIO.output(in7,GPIO.HIGH)
     GPIO.output(in8,GPIO.LOW)
     time.sleep(0.2)
@@ -421,8 +428,11 @@ def drop():
     time.sleep(0.5)
     GPIO.output(in7,GPIO.LOW)
     GPIO.output(in8,GPIO.LOW)
+    time.sleep(0.1)
     goBack()
-    time.sleep(0.7)
+    time.sleep(1.3)
+    goLeft()
+    time.sleep(0.6)
     stopMotor()
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
@@ -451,7 +461,7 @@ def alignRobot(midPoint ,minRange, maxRange):
     recheck = True
     x = 0
 
-def rotate():
+def rotate(d = 'l'):
     # p.ChangeDutyCycle(25)
     # p2.ChangeDutyCycle(25)
     goLeft()
