@@ -424,6 +424,11 @@ def drop():
     goBack()
     time.sleep(0.7)
     stopMotor()
+    GPIO.output(in5,GPIO.HIGH)
+    GPIO.output(in6,GPIO.LOW)
+    time.sleep(0.15)
+    GPIO.output(in5,GPIO.LOW)
+    GPIO.output(in6,GPIO.LOW)
     found = False
     doingTask = False
     x = 0
