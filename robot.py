@@ -184,10 +184,10 @@ def main(argv):
                         print('', flush=True)
 
                     elif "bounding_boxes" in res["result"].keys():
-                        if dropping:
-                            d = 'r'
-                        else:
-                            d='l'
+                        #if dropping:
+                        #    d = 'r'
+                        #else:
+                        #    d='l'
                         if y == 0:
                             startTime2 = time.time()
                             y = 1
@@ -220,7 +220,7 @@ def goToObject(result):
     global searching, dropping, doingTask, found, recheck, x, startTime, startTime2, y, startTime3, z
     if True: #time.time() - startTime2 >= 2.5:
         #y = 0
-        result = result['result']['bounding_boxes'][0]
+        result = result['result']['bounding_boxes']
         for bb in result:
             if searching:
                 if bb['label'] == 'cloth':
@@ -366,11 +366,11 @@ def goToObject(result):
                         print('not in front of robot')
                     break
                 else:
-                    rotate('r')
+                    rotate()
         time.sleep(0.4)
 
 def goForward():
-    p.ChangeDutyCycle(50)
+    p.ChangeDutyCycle(46)
     p2.ChangeDutyCycle(40)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
@@ -459,11 +459,11 @@ def drop():
     time.sleep(0.15)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
-    found = False
-    doingTask = False
-    x = 0
-    dropping = not dropping
-    searching = not searching
+    found = True
+    #doingTask = False
+    #x = 0
+    dropping = False
+    searching = False
 
 def alignRobot(midPoint ,minRange, maxRange):
     print('aligning')
@@ -486,10 +486,7 @@ def rotate(d = 'l'):
     print('rotating')
     # p.ChangeDutyCycle(25)
     # p2.ChangeDutyCycle(25)
-    if d == 'l':
-        goLeft()
-    else:
-        goRight()
+    goLeft()
     time.sleep(0.1)
     stopMotor()
 
