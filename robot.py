@@ -21,8 +21,10 @@ doingTask = False
 recheck = True
 startTime = 0
 startTime2 = 0
+startTime3 = 0
 x = 0
 y = 0
+z = 0
 
 in1 = 16
 in2 = 18
@@ -115,7 +117,7 @@ def help():
     print('python classify.py <modelPath> <Camera port ID, only required when more than 1 camera is present>')
 
 def main(argv):
-    global found, y, startTime2
+    global found, y, startTime2, z, startTime3
     try:
         opts, args = getopt.getopt(argv, "h", ["--help"])
     except getopt.GetoptError:
@@ -186,14 +188,20 @@ def main(argv):
                             d = 'r'
                         else:
                             d='l'
-                        if len(res['result']['bounding_boxes']) == 0:
-                            if not doingTask:
-                                rotate(d)
                         if y == 0:
                             startTime2 = time.time()
                             y = 1
+                        if z == 0:
+                            startTime3 = time.time()
+                            z = 1
+
+                        if time.time() - startTime2 >=1.7:
+                            if len(res['result']['bounding_boxes']) == 0:
+                                rotate(d)
+                                y = 0
+                            else:
+                                goToObject(res)
                         print('Found %d bounding boxes (%d ms.)' % (len(res["result"]["bounding_boxes"]), res['timing']['dsp'] + res['timing']['classification']))
-                        goToObject(res)
                         for bb in res["result"]["bounding_boxes"]:
                             print('\t%s (%.2f): x=%d y=%d w=%d h=%d' % (bb['label'], bb['value'], bb['x'], bb['y'], bb['width'], bb['height']))
                             img = cv2.rectangle(img, (bb['x'], bb['y']), (bb['x'] + bb['width'], bb['y'] + bb['height']), (255, 0, 0), 1)
@@ -209,10 +217,10 @@ def main(argv):
                     runner.stop()
 
 def goToObject(result):
-    global searching, dropping, doingTask, found, recheck, x, startTime, startTime2, y
-    if time.time() - startTime2 >= 2.5:
-        y = 0
-        result = result['result']['bounding_boxes']
+    global searching, dropping, doingTask, found, recheck, x, startTime, startTime2, y, startTime3, z
+    if True: #time.time() - startTime2 >= 2.5:
+        #y = 0
+        result = result['result']['bounding_boxes'][0]
         for bb in result:
             if searching:
                 if bb['label'] == 'cloth':
@@ -237,7 +245,7 @@ def goToObject(result):
                         #if flag:
                         #    break
                         goRight()
-                        time.sleep(0.15)
+                        time.sleep(0.1)
                         stopMotor()
                         time.sleep(0.05)
                         while not recheck:
@@ -276,9 +284,11 @@ def goToObject(result):
                                 grab()
                                 break
                     else:
-                        alignRobot(midPoint, minRange, maxRange)
-                        doingTask = False
-                        print('not in front of robot')
+                        if time.time() - startTime3 >= 2:
+                            z = 0
+                            alignRobot(midPoint, minRange, maxRange)
+                            doingTask = False
+                            print('not in front of robot')
                     break
                 else:
                     rotate()
@@ -456,22 +466,24 @@ def drop():
     searching = not searching
 
 def alignRobot(midPoint ,minRange, maxRange):
+    print('aligning')
     global recheck, x
     # time.sleep(0.4)
     # p.ChangeDutyCycle(25)
     # p2.ChangeDutyCycle(25)
     if midPoint < minRange:
         goLeft()
-        time.sleep(0.1)
+        time.sleep(0.07)
         stopMotor()
     if midPoint > maxRange:
         goRight()
-        time.sleep(0.1)
+        time.sleep(0.07)
         stopMotor()
     recheck = True
     x = 0
 
 def rotate(d = 'l'):
+    print('rotating')
     # p.ChangeDutyCycle(25)
     # p2.ChangeDutyCycle(25)
     if d == 'l':
@@ -480,7 +492,6 @@ def rotate(d = 'l'):
         goRight()
     time.sleep(0.1)
     stopMotor()
-    #time.sleep(2)
 
 
 if __name__ == "__main__":
