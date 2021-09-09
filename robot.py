@@ -245,7 +245,7 @@ def goToObject(result):
                         #if flag:
                         #    break
                         goRight()
-                        time.sleep(0.18)
+                        time.sleep(0.3)
                         stopMotor()
                         time.sleep(0.05)
                         #goForward()
@@ -388,10 +388,10 @@ def goBack():
 def goRight():
     p.ChangeDutyCycle(80)
     p2.ChangeDutyCycle(80)
-    GPIO.output(in1,GPIO.HIGH)
-    GPIO.output(in2,GPIO.LOW)
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.HIGH)
-    GPIO.output(in4,GPIO.LOW)
+    GPIO.output(in4,GPIO.HIGH)
 
 def goLeft():
     p.ChangeDutyCycle(80)
@@ -409,9 +409,9 @@ def stopMotor():
 
 def grab():
     global found, doingTask, searching, dropping, x
-    goForward()
-    time.sleep(0.1)
-    stopMotor()
+    #goForward()
+    #time.sleep(0.1)
+    #stopMotor()
     p4.ChangeDutyCycle(60)
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
