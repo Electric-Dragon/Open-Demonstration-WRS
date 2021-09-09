@@ -48,7 +48,7 @@ GPIO.setup(en,GPIO.OUT)
 GPIO.output(in1,GPIO.LOW)
 GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
-p.start(25)
+p.start(99.9)
 
 GPIO.setup(in3,GPIO.OUT)
 GPIO.setup(in4,GPIO.OUT)
@@ -56,7 +56,7 @@ GPIO.setup(en2,GPIO.OUT)
 GPIO.output(in3,GPIO.LOW)
 GPIO.output(in4,GPIO.LOW)
 p2=GPIO.PWM(en2,1000)
-p2.start(25)
+p2.start(94)
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(in5,GPIO.OUT)
@@ -245,7 +245,7 @@ def goToObject(result):
                         #if flag:
                         #    break
                         goRight()
-                        time.sleep(0.05)
+                        time.sleep(0.18)
                         stopMotor()
                         time.sleep(0.05)
                         #goForward()
@@ -372,32 +372,32 @@ def goToObject(result):
         time.sleep(0.4)
 
 def goForward():
-    p.ChangeDutyCycle(50)
-    p2.ChangeDutyCycle(40)
-    GPIO.output(in1,GPIO.LOW)
-    GPIO.output(in2,GPIO.HIGH)
+    p.ChangeDutyCycle(99.9)
+    p2.ChangeDutyCycle(94)
+    GPIO.output(in1,GPIO.HIGH)
+    GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
 
 def goBack():
-    GPIO.output(in1,GPIO.HIGH)
-    GPIO.output(in2,GPIO.LOW)
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.HIGH)
     GPIO.output(in3,GPIO.LOW)
     GPIO.output(in4,GPIO.HIGH)
 
 def goRight():
-    p.ChangeDutyCycle(30)
-    p2.ChangeDutyCycle(30)
+    p.ChangeDutyCycle(80)
+    p2.ChangeDutyCycle(80)
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.HIGH)
     GPIO.output(in4,GPIO.LOW)
 
 def goLeft():
-    p.ChangeDutyCycle(30)
-    p2.ChangeDutyCycle(30)
-    GPIO.output(in1,GPIO.LOW)
-    GPIO.output(in2,GPIO.HIGH)
+    p.ChangeDutyCycle(80)
+    p2.ChangeDutyCycle(80)
+    GPIO.output(in1,GPIO.HIGH)
+    GPIO.output(in2,GPIO.LOW)
     GPIO.output(in3,GPIO.LOW)
     GPIO.output(in4,GPIO.HIGH)
 
