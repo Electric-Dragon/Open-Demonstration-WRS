@@ -195,7 +195,7 @@ def main(argv):
                             startTime3 = time.time()
                             z = 1
 
-                        if time.time() - startTime2 >=1.7:
+                        if time.time() - startTime2 >=2.1:
                             if len(res['result']['bounding_boxes']) == 0:
                                 rotate(d)
                                 y = 0
@@ -245,9 +245,11 @@ def goToObject(result):
                         #if flag:
                         #    break
                         goRight()
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         stopMotor()
                         time.sleep(0.05)
+                        #goForward()
+                        #time.sleep(2)
                         while not recheck:
                             #print(GPIO.input(ir))
                             #print(GPIO.input(ir2))
@@ -370,7 +372,7 @@ def goToObject(result):
         time.sleep(0.4)
 
 def goForward():
-    p.ChangeDutyCycle(46)
+    p.ChangeDutyCycle(50)
     p2.ChangeDutyCycle(40)
     GPIO.output(in1,GPIO.LOW)
     GPIO.output(in2,GPIO.HIGH)
@@ -407,13 +409,13 @@ def stopMotor():
 
 def grab():
     global found, doingTask, searching, dropping, x
-    goBack()
+    goForward()
     time.sleep(0.1)
     stopMotor()
     p4.ChangeDutyCycle(60)
     GPIO.output(in5,GPIO.HIGH)
     GPIO.output(in6,GPIO.LOW)
-    time.sleep(0.4)
+    time.sleep(0.6)
     GPIO.output(in5,GPIO.LOW)
     GPIO.output(in6,GPIO.LOW)
     GPIO.output(in7,GPIO.HIGH)
